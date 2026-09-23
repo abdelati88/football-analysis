@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دليل التاجينج</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ink:        #0a1120;
+    --surface:    #101a2c;
+    --surface-2:  #16233a;
+    --surface-3:  #1e2e49;
+    --line:       #24344f;
+    --line-soft:  #1b2941;
+    --chalk:      #e9eef7;
+    --chalk-dim:  #9fb0cc;
+    --chalk-faint:#6c7f9d;
+    --turf:       #2c6540;
+    --turf-line:  #dfe8f2;
+    --amber:      #ffb020;
+    --good:       #3fd98a;
+    --bad:        #ff5c5c;
+
+    --pass:       #4fd6a0;
+    --cross:      #7ab8ff;
+    --shot:       #ffb020;
+    --assist:     #ffd88a;
+    --dribble:    #c58cff;
+    --tackle:     #ff8a5c;
+    --intercept:  #ffc861;
+    --block:      #9fb0cc;
+    --clearance:  #6f8fbf;
+
+    --radius:     10px;
+    --radius-lg:  16px;
+
+    --display: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif;
+    --body: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--chalk);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.75;
+    direction: rtl;
+    text-align: right;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------------------------------------------------------- masthead */
+
+  .masthead {
+    padding: 56px 0 32px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--chalk-faint);
+    direction: ltr;
+    text-align: right;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(40px, 7vw, 62px);
+    line-height: .95;
+    letter-spacing: .01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    color: var(--chalk-dim);
+    font-size: 16px;
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  /* ---------------------------------------------------------- verdict */
+
+  .verdict {
+    margin-top: 36px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(180deg, rgba(44,101,64,.20), rgba(44,101,64,0) 60%),
+      var(--surface);
+    overflow: hidden;
+  }
+
+  .verdict-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding: 20px 24px 0;
+  }
+
+  .verdict-head h2 {
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--good);
+  }
+
+  .verdict-head .src {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--chalk-faint);
+    direction: ltr;
+  }
+
+  .verdict-body {
+    padding: 10px 24px 24px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .checks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .check {
+    background: var(--surface-2);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .check .k {
+    font-size: 12px;
+    color: var(--chalk-faint);
+  }
+
+  .check .v {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--chalk);
+    line-height: 1.1;
+  }
+
+  .check .v.ok { color: var(--good); }
+
+  /* ---------------------------------------------------------- sections */
+
+  section { padding-top: 56px; }
+
+  h2.rule {
+    font-family: var(--display);
+    font-size: 34px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  .lede {
+    color: var(--chalk-dim);
+    margin: 0 0 26px;
+    max-width: 64ch;
+  }
+
+  /* ---------------------------------------------------------- the law */
+
+  .law {
+    border-right: 3px solid var(--amber);
+    background: linear-gradient(270deg, rgba(255,176,32,.07), transparent 70%);
+    padding: 18px 22px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-bottom: 28px;
+  }
+
+  .law p { margin: 0; font-size: 17px; }
+  .law strong { color: var(--amber); font-weight: 700; }
+
+  /* ---------------------------------------------------------- events */
+
+  .events {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ev {
+    display: grid;
+    grid-template-columns: 4px 1fr;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .ev .rail { background: var(--c); }
+
+  .ev-in {
+    padding: 16px 20px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .ev-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .ev-name {
+    font-family: var(--display);
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--c);
+    direction: ltr;
+    line-height: 1;
+  }
+
+  .ev-ar {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--chalk);
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--chalk-faint);
+    direction: ltr;
+    white-space: nowrap;
+  }
+
+  .tag.two { border-color: rgba(122,184,255,.35); color: #9ecbff; }
+  .tag.warn { border-color: rgba(255,92,92,.4); color: var(--bad); }
+
+  .ev-when {
+    margin: 0;
+    color: var(--chalk);
+  }
+
+  .ev-not {
+    margin: 0;
+    color: var(--chalk-faint);
+    font-size: 14px;
+    padding-right: 14px;
+    border-right: 2px solid var(--line);
+  }
+
+  .ev-out {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding-top: 4px;
+  }
+
+  .ev-out .lbl {
+    font-size: 12px;
+    color: var(--chalk-faint);
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 4px;
+    background: var(--surface-3);
+    color: var(--chalk-dim);
+    direction: ltr;
+  }
+
+  .pill.none { background: transparent; border: 1px dashed var(--line); color: var(--chalk-faint); }
+
+  /* ---------------------------------------------------------- the four */
+
+  .four {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+  }
+
+  .q {
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-top: 3px solid var(--c);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .q h3 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--c);
+    direction: ltr;
+    text-align: right;
+  }
+
+  .q .who {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--chalk-faint);
+    direction: rtl;
+  }
+
+  .q p { margin: 0; font-size: 14px; color: var(--chalk-dim); }
+
+  /* ---------------------------------------------------------- example */
+
+  .example {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .example .qline {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .answer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .answer .badge {
+    font-family: var(--display);
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--cross);
+    direction: ltr;
+  }
+
+  .answer .slash { color: var(--chalk-faint); }
+  .answer .out { font-family: var(--mono); font-size: 13px; color: var(--bad); direction: ltr; }
+
+  .example p { margin: 0; color: var(--chalk-dim); font-size: 14.5px; }
+
+  /* ---------------------------------------------------------- steps */
+
+  .steps { display: flex; flex-direction: column; gap: 2px; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line-soft);
+    align-items: start;
+  }
+
+  .step:last-child { border-bottom: 0; }
+
+  .step .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--turf-line);
+    background: var(--turf);
+    border-radius: 5px;
+    text-align: center;
+    padding: 3px 0;
+    line-height: 1.4;
+  }
+
+  .step .t { display: grid; gap: 8px; }
+  .step h3 { margin: 0; font-size: 16px; font-weight: 600; }
+  .step p { margin: 0; color: var(--chalk-dim); font-size: 14.5px; }
+
+  pre {
+    margin: 0;
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    direction: ltr;
+    text-align: left;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--chalk-dim);
+  }
+
+  code .c { color: var(--turf-line); }
+  code .f { color: var(--amber); }
+
+  .warn-box {
+    margin-top: 14px;
+    border-right: 3px solid var(--bad);
+    background: linear-gradient(270deg, rgba(255,92,92,.08), transparent 70%);
+    padding: 14px 18px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .warn-box p { margin: 0; font-size: 14.5px; }
+  .warn-box strong { color: var(--bad); }
+
+  .foot {
+    margin-top: 64px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    color: var(--chalk-faint);
+    font-size: 13px;
+  }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 0 16px 64px; }
+    .masthead { padding-top: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Match Tagger · Event Vocabulary</div>
+    <h1>دليل التاجينج</h1>
+    <p class="standfirst">
+      تسع أنواع أحداث، وقاعدة واحدة بتفصل بينهم. الصفحة دي تفضل مفتوحة جنبك وإنت بتتاج.
+    </p>
+  </header>
+
+  <div class="verdict">
+    <div class="verdict-head">
+      <h2>الفيديو ده مظبوط</h2>
+      <span class="src">PSG 5–0 Inter · Tactical Cam · 1:52:29</span>
+    </div>
+    <div class="verdict-body">
+      <div class="checks">
+        <div class="check"><span class="k">زاوية الكاميرا</span><span class="v ok">تكتيكية</span></div>
+        <div class="check"><span class="k">خطوط الملعب</span><span class="v ok">باينة</span></div>
+        <div class="check"><span class="k">القطع</span><span class="v ok">مفيش</span></div>
+        <div class="check"><span class="k">الطول</span><span class="v">١:٥٢ ساعة</span></div>
+      </div>
+      <p style="margin:0;color:var(--chalk-dim)">
+        من الصورة، الماتش بيبدأ من ثانية ٠:٠٥ على ضربة البداية — يعني مفيش مقدمة ولا سلام.
+        خد <strong style="color:var(--chalk)">من الدقيقة ٥ للدقيقة ١٥</strong>: اللعب بيكون استقر،
+        ولسه بدري على أي توقف طويل.
+      </p>
+    </div>
+  </div>
+
+  <section>
+    <h2 class="rule">القاعدة الوحيدة</h2>
+    <p class="lede">لو حفظت السطر ده، ٩٠٪ من الحيرة هتختفي.</p>
+
+    <div class="law">
+      <p>
+        <strong>النية بتحدد النوع. النتيجة بتحدد الـ Outcome.</strong>
+      </p>
+    </div>
+
+    <div class="example">
+      <p class="qline">سؤالك: لاعب عمل سنتر والكورة طلعت بره الملعب — دي إيه؟</p>
+      <div class="answer">
+        <span class="badge">Cross</span>
+        <span class="slash">/</span>
+        <span class="out">Unsuccessful</span>
+      </div>
+      <p>
+        هو <strong style="color:var(--chalk)">كان ناوي</strong> يعمل عرضية → النوع <span class="pill">Cross</span>.
+        الكورة <strong style="color:var(--chalk)">ماوصلتش</strong> → النتيجة <span class="pill">Unsuccessful</span>.
+        مش <span class="pill">Clearance</span>، لأن التشتيت بيبقى من مدافع بيبعّد الخطر — مش من مهاجم بيحاول يبني هجمة.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="rule">التسعة كلهم</h2>
+    <p class="lede">
+      الأسماء بالإنجليزي زي ما هي في البرنامج بالظبط — دوس على الاسم ده مش على ترجمته.
+      <span class="tag two">نقرتين</span> يعني الحدث ليه اتجاه: تدوس مكان البداية وبعدين مكان النهاية.
+    </p>
+
+    <div class="events">
+
+      <div class="ev" style="--c: var(--pass)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Pass</span>
+            <span class="ev-ar">تمريرة</span>
+            <span class="tag two">نقرتين</span>
+          </div>
+          <p class="ev-when">لاعب بعت الكورة لزميله على الأرض أو في الهوا، في أي مكان في الملعب.</p>
+          <p class="ev-not">مش تمريرة لو كانت عرضية من على الجناح ناحية منطقة الجزاء — دي <b>Cross</b>.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill">Successful</span><span class="pill">Unsuccessful</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--cross)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Cross</span>
+            <span class="ev-ar">عرضية</span>
+            <span class="tag two">نقرتين</span>
+          </div>
+          <p class="ev-when">كورة معروضة من الجناح ناحية منطقة الجزاء، عالية أو أرضية.</p>
+          <p class="ev-not">لو راحت لزميل بره المنطقة أو رجعت لورا، دي <b>Pass</b> عادية.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill">Successful</span><span class="pill">Unsuccessful</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--shot)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Shot</span>
+            <span class="ev-ar">تسديدة</span>
+            <span class="tag two">نقرتين</span>
+          </div>
+          <p class="ev-when">أي محاولة ناوية تدخل الجون — قدم أو راس.</p>
+          <p class="ev-not">النقرة التانية تحطها <b>على الجون</b>، مش على مكان وقوف اللاعب.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill">Goal</span><span class="pill">Saved</span><span class="pill">Off Target</span><span class="pill">Blocked</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--assist)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Shot Assist</span>
+            <span class="ev-ar">التمريرة اللي قبل التسديدة</span>
+            <span class="tag two">نقرتين</span>
+          </div>
+          <p class="ev-when">التمريرة اللي جت مباشرة قبل تسديدة — سواء التسديدة دخلت أو لأ.</p>
+          <p class="ev-not">لو التمريرة اتلعبت وبعدها اللاعب راوغ اتنين وبعدين سدد، دي مش Shot Assist.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill">Successful</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--dribble)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Dribble</span>
+            <span class="ev-ar">مراوغة</span>
+            <span class="tag two">نقرتين</span>
+          </div>
+          <p class="ev-when">اللاعب عدّى بالكورة من مدافع واقف قدامه.</p>
+          <p class="ev-not">مجرد إنه جري بالكورة في مساحة فاضية <b>مش مراوغة</b> — لازم يكون فيه مدافع اتعدّى.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill">Successful</span><span class="pill">Failed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--tackle)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Tackle</span>
+            <span class="ev-ar">التحام / خطف الكورة</span>
+            <span class="tag">نقرة واحدة</span>
+          </div>
+          <p class="ev-when">الكورة كانت <b>في رجل الخصم</b>، والمدافع دخل عليه واشتبك معاه عشان ياخدها.</p>
+          <p class="ev-not">لو الكورة كانت طايرة بين اتنين ومحدش لمسه، دي <b>Interception</b> مش Tackle.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill">Successful</span><span class="pill">Unsuccessful</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--intercept)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Interception</span>
+            <span class="ev-ar">قطع</span>
+            <span class="tag">نقرة واحدة</span>
+          </div>
+          <p class="ev-when">قرأ التمريرة ووقف في طريقها. الكورة كانت <b>ماشية بين اتنين خصوم</b>.</p>
+          <p class="ev-not">مفيش Outcome — القطع إما حصل أو ملحصش، ولو ملحصش يبقى مفيش حدث أصلاً.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill none">مفيش — القايمة بتختفي</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--clearance)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Clearance</span>
+            <span class="ev-ar">تشتيت</span>
+            <span class="tag two">نقرتين</span>
+          </div>
+          <p class="ev-when">مدافع بعّد الكورة عن الخطر <b>من غير هدف محدد</b> — المهم إنها تبعد.</p>
+          <p class="ev-not">لو باصها لزميل معيّن وهو مرتاح، دي <b>Pass</b> مش تشتيت.</p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill none">مفيش</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ev" style="--c: var(--block)">
+        <div class="rail"></div>
+        <div class="ev-in">
+          <div class="ev-top">
+            <span class="ev-name">Block</span>
+            <span class="ev-ar">صد تسديدة</span>
+            <span class="tag">نقرة واحدة</span>
+            <span class="tag warn">البرنامج مبيعملهاش</span>
+          </div>
+          <p class="ev-when">مدافع صدّ <b>تسديدة</b> بجسمه.</p>
+          <p class="ev-not">
+            التحليل مش بيطلّع النوع ده خالص، فأي Block تتاجه هيتحسب <b>حدث ضايع</b> ويوطّي الرقم من غير ذنب.
+            استخدم <b>Shot / Blocked</b> بدالها.
+          </p>
+          <div class="ev-out">
+            <span class="lbl">Outcome:</span>
+            <span class="pill none">مفيش</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2 class="rule">الأربعة اللي بيتلخبطوا</h2>
+    <p class="lede">
+      كل الحيرة في الدفاع بتتحل بسؤال واحد: <b style="color:var(--chalk)">الكورة كانت مع مين لحظة الحدث؟</b>
+    </p>
+
+    <div class="four">
+      <div class="q" style="--c: var(--intercept)">
+        <h3>Interception</h3>
+        <div class="who">الكورة كانت مع محدش</div>
+        <p>ماشية في الهوا أو على الأرض بين لاعبين من الفريق التاني، فوقف في طريقها.</p>
+      </div>
+      <div class="q" style="--c: var(--tackle)">
+        <h3>Tackle</h3>
+        <div class="who">الكورة كانت مع الخصم</div>
+        <p>في رجله، ودخل عليه واشتبك معاه عشان يخطفها منه.</p>
+      </div>
+      <div class="q" style="--c: var(--clearance)">
+        <h3>Clearance</h3>
+        <div class="who">الكورة بقت معايا</div>
+        <p>ووصلتني وأنا تحت ضغط، فبعّدتها من غير ما أدوّر على زميل.</p>
+      </div>
+      <div class="q" style="--c: var(--block)">
+        <h3>Block</h3>
+        <div class="who">الكورة كانت تسديدة</div>
+        <p>معترضها بجسمه وهي رايحة الجون. سجّلها <b style="color:var(--chalk)">Shot / Blocked</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="rule">الخطوات</h2>
+    <p class="lede">من الفيديو للرقم.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <span class="n">١</span>
+        <div class="t">
+          <h3>نزّل الماتش واقص منه عشر دقايق</h3>
+          <pre><code><span class="c"># لو yt-dlp مش متسطب</span>
+brew install yt-dlp
+
+yt-dlp -f <span class="f">"bv*[height&lt;=1080]+ba/b"</span> -o match.mp4 <span class="f">"&lt;الرابط&gt;"</span>
+
+ffmpeg -i match.mp4 -ss <span class="f">00:05:00</span> -t <span class="f">00:10:00</span> -c copy tenmin.mp4</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="n">٢</span>
+        <div class="t">
+          <h3>اتأكد إنه نافع قبل ما تتعب</h3>
+          <pre><code>.venv/bin/python training/scripts/check_video.py tenmin.mp4</code></pre>
+          <p>لازم يقول <b style="color:var(--good)">GOOD — tag this one</b>. لو قال غير كده، متبدأش.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="n">٣</span>
+        <div class="t">
+          <h3>تاج بإيدك</h3>
+          <p>
+            ارفعه على الموقع وتاج كل لمسة. حط <b style="color:var(--chalk)">كل الأنواع</b> —
+            مراوغة وقطع والتحام وعرضية وتسديدة، مش تمرير وتشتيت بس.
+            اللي ماتتاجّش <b style="color:var(--chalk)">مبيتقاسش</b>، وفي المرة اللي فاتت اتقاس نوعين من تسعة.
+          </p>
+          <div class="warn-box">
+            <p>
+              <strong>سيب أسامي الفرق زي ما هي:</strong> <span class="pill">Team 1</span> و <span class="pill">Team 2</span>.
+              المقارنة بتطابق على اسم الفريق، ولو غيّرته كل الأحداث هتتحسب غلط لسبب مالوش علاقة بالدقة.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="n">٤</span>
+        <div class="t">
+          <h3>احفظ وابعتلي رقم الماتش</h3>
+          <p>
+            دوس <b style="color:var(--chalk)">Save match</b>، وقولّي الرقم اللي طلعلك.
+            وأنا أشغّل التحليل على نفس العشر دقايق وأقارن، ونشوف الدقة الحقيقية.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2 class="rule">حاجة أخيرة</h2>
+    <p class="lede" style="max-width:64ch">
+      نهائي دوري أبطال أوروبا محفوظ الحقوق لليويفا. للقياس عندنا على الجهاز <b style="color:var(--chalk)">تمام</b> —
+      دي بيانات داخلية. لكن لما توصل لعرض على ناد، اعرض على
+      <b style="color:var(--chalk)">فيديو منهم هم</b> أو فيديو صوّرته بنفسك.
+      كده الحقوق ملكك، والناد بيشوف <b style="color:var(--chalk)">لاعيبته هو</b> — وده أقوى بكتير من ماتش على التلفزيون.
+    </p>
+  </section>
+
+  <div class="foot">
+    الأسماء والـ Outcomes متطابقة مع اللي في البرنامج بالظبط · التسامح في التوقيت ٤ ثواني، فمش لازم تكون مضبوط بالإطار
+  </div>
+
+</div>
+
+</body>
+</html>

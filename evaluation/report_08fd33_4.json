@@ -1,0 +1,38 @@
+{
+  "truth": 9,
+  "predicted": 19,
+  "matched": 7,
+  "missed": 2,
+  "spurious": 12,
+  "recall": 0.7777777777777778,
+  "precision": 0.3684210526315789,
+  "outcome_accuracy": 0.7142857142857143,
+  "median_time_error_s": 1.0,
+  "per_kind": {
+    "Pass": {
+      "truth": 7,
+      "predicted": 8,
+      "matched": 6
+    },
+    "Clearance": {
+      "truth": 2,
+      "predicted": 1,
+      "matched": 1
+    },
+    "Dribble": {
+      "truth": 0,
+      "predicted": 5,
+      "matched": 0
+    },
+    "Interception": {
+      "truth": 0,
+      "predicted": 4,
+      "matched": 0
+    },
+    "Cross": {
+      "truth": 0,
+      "predicted": 1,
+      "matched": 0
+    }
+  }
+}

@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Uploaded videos and the annotated copies the analysis produces. They belong
+# to a single machine's run and are large; the database keeps the events.
+uploads/
+
+# OS
+.DS_Store
+
+# Virtual environments
+venv/
+.venv/
+
+# Secrets
+.env
+.env.*
+
+# Local database / Flask instance folder
+instance/
+*.db
+*.sqlite3

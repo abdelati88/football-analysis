@@ -1,0 +1,16 @@
+{
+  "matchName": "",
+  "team1": "Team 1",
+  "team2": "Team 2",
+  "events": [
+    {"Team":"Team 1","Player":"","Event":"Pass","Outcome":"Successful","Mins":0,"Secs":4,"X":65.4,"Y":73.4,"X2":35.8,"Y2":65.4,"half":1,"source":"manual","t":4.912104},
+    {"Team":"Team 1","Player":"","Event":"Pass","Outcome":"Unsuccessful","Mins":0,"Secs":14,"X":22.8,"Y":52.8,"X2":74,"Y2":50,"half":1,"source":"manual","t":14.709251},
+    {"Team":"Team 2","Player":"","Event":"Clearance","Outcome":"","Mins":0,"Secs":16,"X":75,"Y":50.2,"X2":59.6,"Y2":50.1,"half":1,"source":"manual","t":16},
+    {"Team":"Team 1","Player":"","Event":"Clearance","Outcome":"","Mins":0,"Secs":17,"X":60,"Y":50.8,"X2":94.8,"Y2":60.1,"half":1,"source":"manual","t":17.843961},
+    {"Team":"Team 2","Player":"","Event":"Pass","Outcome":"Successful","Mins":0,"Secs":20,"X":101.8,"Y":68.7,"X2":117,"Y2":46.5,"half":1,"source":"manual","t":20.960567},
+    {"Team":"Team 2","Player":"","Event":"Pass","Outcome":"Successful","Mins":0,"Secs":24,"X":117.1,"Y":44.4,"X2":85.9,"Y2":45.2,"half":1,"source":"manual","t":24},
+    {"Team":"Team 2","Player":"","Event":"Pass","Outcome":"Successful","Mins":0,"Secs":26,"X":83.1,"Y":47,"X2":86.6,"Y2":55.3,"half":1,"source":"manual","t":26},
+    {"Team":"Team 2","Player":"","Event":"Pass","Outcome":"Successful","Mins":0,"Secs":28,"X":86.1,"Y":56.7,"X2":62.7,"Y2":55.4,"half":1,"source":"manual","t":28.207856},
+    {"Team":"Team 2","Player":"","Event":"Pass","Outcome":"Successful","Mins":0,"Secs":29,"X":64.3,"Y":57.3,"X2":70.7,"Y2":61.7,"half":1,"source":"manual","t":29.126297}
+  ]
+}

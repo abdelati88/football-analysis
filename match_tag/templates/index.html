@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Match Tag — football event tagging and automatic analysis</title>
+<meta name="description" content="Tag football match events by hand, or let computer vision find them for you. Video stays on your device.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3666367802925191"
+        crossorigin="anonymous"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230a1120'/><rect x='5' y='9' width='22' height='14' rx='2' fill='none' stroke='%23ffb020' stroke-width='2'/><line x1='16' y1='9' x2='16' y2='23' stroke='%23ffb020' stroke-width='2'/><circle cx='16' cy='16' r='3' fill='none' stroke='%23ffb020' stroke-width='2'/></svg>">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">Match<b>Tag</b></div>
+
+  <div class="scoreline">
+    <div class="side">
+      <span class="swatch" id="swatch1" style="background: var(--team-1)"></span>
+      <span class="name" id="scoreName1">Team 1</span>
+    </div>
+    <span class="score"><span id="score1">0</span>–<span id="score2">0</span></span>
+    <div class="side">
+      <span class="name" id="scoreName2">Team 2</span>
+      <span class="swatch" id="swatch2" style="background: var(--team-2)"></span>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <button class="btn btn-primary" id="btnAnalyse"
+          title="Send the loaded video to the vision models">
+    Analyse with AI
+  </button>
+  <button class="btn" id="btnSave">Save match</button>
+  <a class="btn btn-github" href="https://github.com/abdelati88/match_tag" target="_blank" rel="noopener"
+     title="Star this project on GitHub">
+    <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+    Star
+  </a>
+  <button class="btn btn-icon btn-ghost" id="btnKeys" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">⌘</button>
+  <button class="btn btn-icon btn-ghost btn-danger" id="btnReset" title="Clear everything" aria-label="Clear everything">↺</button>
+</header>
+
+<main class="workspace">
+
+  <!-- ============ LEFT: video and the match timeline ============ -->
+  <div class="stack">
+    <section class="panel">
+      <div class="video-frame">
+        <video id="video" playsinline preload="metadata"></video>
+        <div class="video-empty" id="videoEmpty">
+          <div class="figure">No video loaded</div>
+          <p class="muted" style="max-width: 42ch; margin: 0">
+            Pick a match video to tag against. It is read straight from your device
+            and never uploaded, unless you ask for an AI analysis.
+          </p>
+          <button class="btn btn-primary" id="btnPickVideo">Choose a video</button>
+          <input type="file" id="fileInput" accept="video/*" hidden>
+        </div>
+      </div>
+
+      <div class="video-controls">
+        <button class="btn btn-icon" id="btnPlay" title="Play / pause (Space)" aria-label="Play or pause">▶</button>
+        <div class="clock"><b id="clockNow">0:00.00</b> <span class="faint">/</span> <span id="clockTotal" class="muted">0:00</span></div>
+        <button class="btn btn-sm" id="btnBack5" title="Back 5 seconds (Shift + ←)">−5s</button>
+        <button class="btn btn-sm" id="btnFrameBack" title="Previous frame (,)">◀|</button>
+        <button class="btn btn-sm" id="btnFrameFwd" title="Next frame (.)">|▶</button>
+        <button class="btn btn-sm" id="btnFwd5" title="Forward 5 seconds (Shift + →)">+5s</button>
+
+        <select class="select" id="speed" style="width: 78px" title="Playback speed" aria-label="Playback speed">
+          <option value="0.25">0.25×</option>
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.5">1.5×</option>
+          <option value="2">2×</option>
+        </select>
+
+        <div class="spacer" style="flex:1"></div>
+
+        <div class="field" style="flex-direction: row; align-items: center; gap: 7px">
+          <label for="half" style="margin:0">Half</label>
+          <select class="select" id="half" style="width: 92px">
+            <option value="1">First</option>
+            <option value="2">Second</option>
+          </select>
+        </div>
+        <button class="btn btn-sm" id="btnChangeVideo">Change video</button>
+      </div>
+
+      <!-- The signature element: every event as a tick, above or below the
+           centre axis by team, with the playhead riding across it. -->
+      <div class="timeline" id="timeline" role="slider" tabindex="0"
+           aria-label="Match timeline" aria-valuemin="0" aria-valuenow="0">
+        <canvas id="timelineCanvas"></canvas>
+      </div>
+      <div class="timeline-legend" id="timelineLegend"></div>
+    </section>
+
+    <section class="panel feed" style="flex: 1; min-height: 220px">
+      <div class="panel-head">
+        <h2 class="panel-title">Just tagged</h2>
+        <div class="spacer"></div>
+        <span class="eyebrow" id="feedCount"></span>
+      </div>
+      <div class="feed-list" id="feed"></div>
+    </section>
+  </div>
+
+  <!-- ============ RIGHT: the pitch and the tagging controls ============ -->
+  <div class="stack">
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Pitch</h2>
+        <span class="eyebrow" id="pitchMode">Click to place an event</span>
+        <div class="spacer"></div>
+        <button class="btn btn-sm" id="btnUndo" title="Undo last event (Z)">Undo</button>
+        <button class="btn btn-sm btn-danger" id="btnClearEvents">Clear all</button>
+      </div>
+      <div class="panel-body">
+        <div class="pitch-wrap" id="pitchWrap">
+          <canvas id="pitch" width="1200" height="800"></canvas>
+          <div class="pitch-hint" id="pitchHint"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Tag</h2>
+        <div class="spacer"></div>
+        <span class="eyebrow" id="tagSummary"></span>
+      </div>
+      <div class="panel-body" style="display: grid; gap: 12px">
+
+        <div class="row" style="justify-content: space-between; align-items: baseline; margin-bottom: 6px">
+          <span class="eyebrow">Team</span>
+          <!-- The names and shirt colours live in Setup, which is a tab away and
+               below the fold. Without a way in from here they read as fixed. -->
+          <button type="button" class="link-button" id="linkTeamSetup">name the teams &amp; set their colours</button>
+        </div>
+        <div class="team-toggle" id="teamToggle" role="group" aria-label="Team in possession">
+          <button data-team="1" class="is-active"><i style="background: var(--team-1)"></i><span id="toggleName1">Team 1</span></button>
+          <button data-team="2"><i style="background: var(--team-2)"></i><span id="toggleName2">Team 2</span></button>
+        </div>
+
+        <div class="row" style="gap: 10px">
+          <div class="field" style="flex: 1 1 190px">
+            <label for="playerSel">
+              Player
+              <button type="button" class="link-button" id="linkSquads">edit squads</button>
+            </label>
+            <select class="select" id="playerSel"></select>
+          </div>
+          <div class="field" style="flex: 1 1 150px">
+            <label for="playerFree">Or type a name</label>
+            <input class="input" id="playerFree" placeholder="e.g. Salah" autocomplete="off">
+          </div>
+          <div class="field" id="outcomeField" style="flex: 1 1 150px">
+            <label for="outcome">Outcome</label>
+            <select class="select" id="outcome"></select>
+          </div>
+        </div>
+
+        <div>
+          <div class="eyebrow" style="margin-bottom: 7px">Event type</div>
+          <div class="palette" id="palette"></div>
+          <div class="row" style="margin-top: 8px">
+            <input class="input" id="newEvent" placeholder="Add an event type" style="width: 190px" autocomplete="off">
+            <button class="btn btn-sm" id="btnAddEvent">Add</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ FULL WIDTH: the workspace tabs ============ -->
+  <section class="panel full-width">
+    <div class="panel-head" style="padding-bottom: 0; padding-left: 6px">
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" data-tab="events" role="tab">Events <span class="count" id="countEvents">0</span></button>
+        <button class="tab" data-tab="stats" role="tab">Statistics</button>
+        <button class="tab" data-tab="squads" role="tab">Squads</button>
+        <button class="tab" data-tab="ai" role="tab">AI analysis</button>
+        <button class="tab" data-tab="saved" role="tab">Saved matches</button>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn btn-sm" id="btnExportCsv">Export CSV</button>
+      <button class="btn btn-sm" id="btnExportJson">Export JSON</button>
+    </div>
+
+    <!-- Events -->
+    <div class="tabpane is-active" data-pane="events">
+      <div class="panel-body" style="padding-bottom: 8px">
+        <div class="row">
+          <input class="input" id="eventSearch" placeholder="Filter by player, event or outcome" style="width: 260px">
+          <select class="select" id="eventTeamFilter" style="width: 150px">
+            <option value="">Both teams</option>
+          </select>
+          <select class="select" id="eventTypeFilter" style="width: 160px">
+            <option value="">All event types</option>
+          </select>
+          <select class="select" id="eventSourceFilter" style="width: 150px">
+            <option value="">Tagged and detected</option>
+            <option value="manual">Tagged by hand</option>
+            <option value="ai">Detected by AI</option>
+          </select>
+          <div class="spacer" style="flex:1"></div>
+          <span class="eyebrow" id="eventsShown"></span>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data" id="eventsTable">
+          <thead>
+            <tr>
+              <th class="sortable" data-key="index">#</th>
+              <th class="sortable" data-key="time">Time</th>
+              <th class="sortable" data-key="Team">Team</th>
+              <th class="sortable" data-key="Player">Player</th>
+              <th class="sortable" data-key="Event">Event</th>
+              <th class="sortable" data-key="Outcome">Outcome</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Source</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="tabpane" data-pane="stats">
+      <div class="panel-body" id="statsPane"></div>
+    </div>
+
+    <!-- Squads -->
+    <div class="tabpane" data-pane="squads">
+      <div class="panel-body">
+        <div class="row" style="align-items: flex-start; gap: 14px">
+          <div class="field" style="flex: 1 1 300px">
+            <label for="team1Name">Home team name</label>
+            <input class="input" id="team1Name" placeholder="e.g. Barcelona" autocomplete="off">
+            <label for="team1Colour" style="margin-top: 8px">Shirt colour</label>
+            <input type="color" class="input" id="team1Colour" value="#e8503a" style="padding: 3px; height: 34px">
+            <label for="t1Roster" style="margin-top: 8px">Squad — one player per line</label>
+            <textarea class="input" id="t1Roster" rows="12" spellcheck="false"
+              placeholder="1 Ter Stegen&#10;2 Cancelo&#10;3 Balde&#10;4 Araujo&#10;…&#10;&#10;One player per line. They appear in the Player menu while you tag."></textarea>
+          </div>
+          <div class="field" style="flex: 1 1 300px">
+            <label for="team2Name">Away team name</label>
+            <input class="input" id="team2Name" placeholder="e.g. Real Madrid" autocomplete="off">
+            <label for="team2Colour" style="margin-top: 8px">Shirt colour</label>
+            <input type="color" class="input" id="team2Colour" value="#3d8bfd" style="padding: 3px; height: 34px">
+            <label for="t2Roster" style="margin-top: 8px">Squad — one player per line</label>
+            <textarea class="input" id="t2Roster" rows="12" spellcheck="false"
+              placeholder="1 Courtois&#10;2 Carvajal&#10;4 Alaba&#10;…&#10;&#10;One player per line. They appear in the Player menu while you tag."></textarea>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 12px">
+          <button class="btn btn-primary" id="btnApplySquads">Apply</button>
+          <span class="muted" style="font-size: 12.5px">Squads and team names are kept in this browser.</span>
+        </div>
+
+        <div id="trackMapping" style="margin-top: 20px"></div>
+      </div>
+    </div>
+
+    <!-- AI analysis -->
+    <div class="tabpane" data-pane="ai">
+      <div class="panel-body" id="aiPane"></div>
+    </div>
+
+    <!-- Saved matches -->
+    <div class="tabpane" data-pane="saved">
+      <div class="panel-body" style="padding-bottom: 8px">
+        <div class="row">
+          <button class="btn btn-sm" id="btnRefreshMatches">Refresh</button>
+          <span class="muted" style="font-size: 12.5px">Saved matches live on the server this page is served from.</span>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data" id="savedTable">
+          <thead>
+            <tr>
+              <th>#</th><th>Match</th><th>Teams</th><th>Events</th>
+              <th>Source</th><th>Saved</th><th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- One ad unit, below the work rather than through it. Replace data-ad-slot
+     with a slot id from your AdSense account; until then the account's Auto Ads
+     setting decides whether anything is served here. -->
+<aside class="ad-slot" aria-label="Advertisement">
+  <span class="eyebrow">Advertisement</span>
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-3666367802925191"
+       data-ad-slot=""
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</aside>
+
+<footer class="site-footer">
+  <p class="footer-line">
+    Match Tag — tag by hand or let the models do the first pass, then correct them.
+  </p>
+  <p class="faint" style="margin: 4px 0 14px">
+    Your video never leaves this device unless you start an AI analysis.
+  </p>
+  <div class="footer-links">
+    <a href="https://github.com/abdelati88/match_tag" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+      Source on GitHub
+    </a>
+    <a href="https://www.linkedin.com/in/abdelati88" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z"/></svg>
+      Built by Abdelati88
+    </a>
+  </div>
+  <p class="faint" style="margin-top: 12px; font-size: 11.5px">
+    © 2026 abdelati88.shop — All rights reserved.
+  </p>
+</footer>
+
+<div class="toast-stack" id="toasts" aria-live="polite"></div>
+
+<dialog class="sheet" id="keysDialog">
+  <div class="panel-head">
+    <h2 class="panel-title">Keyboard</h2>
+    <div class="spacer"></div>
+    <button class="btn btn-sm" data-close-dialog>Close</button>
+  </div>
+  <div class="panel-body">
+    <div class="keys">
+      <div><span>Play / pause</span> <kbd>Space</kbd></div>
+      <div><span>Back / forward 1s</span> <kbd>← →</kbd></div>
+      <div><span>Back / forward 5s</span> <kbd>Shift ← →</kbd></div>
+      <div><span>Step one frame</span> <kbd>, .</kbd></div>
+      <div><span>Slower / faster</span> <kbd>- +</kbd></div>
+      <div><span>Pick event type</span> <kbd>1 … 9</kbd></div>
+      <div><span>Home team</span> <kbd>Q</kbd></div>
+      <div><span>Away team</span> <kbd>W</kbd></div>
+      <div><span>Undo last event</span> <kbd>Z</kbd></div>
+      <div><span>Cancel a pending start point</span> <kbd>Esc</kbd></div>
+      <div><span>Save the match</span> <kbd>Ctrl S</kbd></div>
+      <div><span>This panel</span> <kbd>?</kbd></div>
+    </div>
+    <div class="notice" style="margin-top: 14px">
+      Events with a start and an end — passes, crosses, shots, dribbles, clearances —
+      take two clicks on the pitch. The rest take one.
+    </div>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="analyseDialog">
+  <form method="dialog" id="analyseForm">
+    <div class="panel-head">
+      <h2 class="panel-title">Analyse with AI</h2>
+      <div class="spacer"></div>
+      <button class="btn btn-sm" type="button" data-close-dialog>Cancel</button>
+    </div>
+    <div class="panel-body" id="analyseDialogBody"></div>
+  </form>
+</dialog>
+
+<script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

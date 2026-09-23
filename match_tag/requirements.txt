@@ -1,0 +1,11 @@
+# --- Web application ---
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Cors==4.0.1
+SQLAlchemy==2.0.36
+Werkzeug==3.0.6
+gunicorn==22.0.0
+python-dotenv==1.0.1
+psycopg2-binary==2.9.10   # only needed when DATABASE_URL points at Postgres
+
+# The automatic analysis additionally needs ../requirements-cv.txt
