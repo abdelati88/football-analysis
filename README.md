@@ -391,6 +391,46 @@ learned the hard way and encoded in the recipes:
 
 ---
 
+## Deploying the demo
+
+The `Dockerfile` at the root builds the tagger **without** the vision engine.
+It installs only `match_tag/requirements.txt`; `requirements-cv.txt` — torch,
+ultralytics, opencv, well over a gigabyte — is left out. The engine is imported
+lazily by `match_tag/analysis.py`, so the app starts without it and reports the
+engine as unavailable rather than failing.
+
+```bash
+docker build -t match-tag-demo .
+docker run -p 5055:5055 match-tag-demo
+```
+
+The image sets `PUBLIC_DEMO=1`, which turns on a guard in `create_app()`:
+
+| | |
+|---|---|
+| every non-`GET` under `/api/analysis` | `403` |
+| `DELETE` under `/api/matches` | `403` |
+| upload ceiling | 2 MB instead of 4 GB |
+
+The analysis block runs in `before_request`, ahead of the request body. That
+placement is the point: `start_analysis()` saves the uploaded file *before* it
+checks whether the engine is available, so refusing later would still let a
+stranger with the public URL fill the disk with videos nothing will read.
+
+Without `PUBLIC_DEMO` set, behaviour is exactly as it is locally.
+
+Two deployment details:
+
+- **One worker.** `gunicorn -w 1`. The `JobRunner` holding analysis job state
+  lives in the process, so a second worker would answer status polls about jobs
+  it has never heard of. Concurrency comes from `--threads 4`.
+- **Mount a volume at `/app/match_tag/instance`** if saved matches should
+  survive a redeploy. The SQLite database lives there, and without a volume the
+  container's filesystem takes it with it. `DATABASE_URL` pointing at Postgres
+  is the other option.
+
+---
+
 ## Licence
 
 MIT. The datasets are CC BY 4.0 and are attributed above.

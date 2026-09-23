@@ -1,0 +1,30 @@
+# Keep the build context small and free of anything that must not ship.
+# Model weights, videos and the local database are the three that matter:
+# weights and videos are large, and the database holds real tagged matches.
+
+.git
+.venv
+venv
+__pycache__
+.pytest_cache
+
+# Datasets, trained weights and training output — none of it is used by the
+# demo, and all of it is large.
+datasets
+runs
+training/runs
+training/logs
+*.pt
+*.onnx
+
+# Video, in and out.
+input_videos
+output_videos
+uploads
+*.mp4
+*.mov
+
+# Local state and secrets.
+match_tag/instance
+*.db
+.env*

@@ -48,7 +48,24 @@ def engine_status():
             "weights": {},
         })
 
-    available = weights.available()
+    # Importing the package is not the same as being able to run it.
+    # `football_ai` imports fine with no torch installed — it defers that to
+    # first use — so the guard above passes and `pick_device()` then raises
+    # ImportError inside the view. On a deployment built without the CV
+    # requirements that turned this endpoint into a 500, and the interface
+    # calls it on load, so the first thing a visitor met was a server error
+    # rather than "analysis is unavailable here".
+    try:
+        available = weights.available()
+        device = weights.pick_device()
+    except Exception as exc:
+        return jsonify({
+            "available": False,
+            "reason": "The vision engine is not installed on this server.",
+            "detail": str(exc),
+            "weights": {},
+        })
+
     missing = [name for name in ("players", "pitch") if not available.get(name)]
     return jsonify({
         "available": not missing,
@@ -58,7 +75,7 @@ def engine_status():
                  f"Train them with: python training/scripts/train.py {missing[0]}"
         ),
         "weights": available,
-        "device": weights.pick_device(),
+        "device": device,
         "busy": current_app.extensions["job_runner"].busy,
         "current_job": current_app.extensions["job_runner"].current_job,
     })

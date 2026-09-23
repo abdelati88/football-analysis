@@ -10,7 +10,7 @@ import os
 import sys
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, send_from_directory, url_for
+from flask import Flask, jsonify, render_template, request, send_from_directory, url_for
 from flask_cors import CORS
 
 HERE = Path(__file__).resolve().parent
@@ -32,15 +32,27 @@ from models import db, ensure_schema           # noqa: E402
 # fits comfortably; anything larger is a mistake rather than a match.
 MAX_UPLOAD_BYTES = 4 * 1024 * 1024 * 1024
 
+# The public demo has no vision engine, no GPU and a small disk, so it offers
+# the tagger and nothing that writes at scale. Two megabytes is far below any
+# real video and still leaves room for a mis-click to arrive and be refused
+# with a readable message rather than a dropped connection.
+DEMO_UPLOAD_BYTES = 2 * 1024 * 1024
+
+
+def public_demo() -> bool:
+    return os.getenv("PUBLIC_DEMO") == "1"
+
 
 def create_app(config: dict | None = None) -> Flask:
     app = Flask(__name__, static_folder="static", template_folder="templates")
+
+    demo = public_demo()
 
     database_url = os.getenv("DATABASE_URL") or f"sqlite:///{HERE / 'instance' / 'football1.db'}"
     app.config.update(
         SQLALCHEMY_DATABASE_URI=database_url,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        MAX_CONTENT_LENGTH=MAX_UPLOAD_BYTES,
+        MAX_CONTENT_LENGTH=DEMO_UPLOAD_BYTES if demo else MAX_UPLOAD_BYTES,
         UPLOAD_DIR=os.getenv("UPLOAD_DIR", str(PROJECT_ROOT / "uploads")),
         JSON_SORT_KEYS=False,
     )
@@ -79,6 +91,27 @@ def create_app(config: dict | None = None) -> Flask:
 
     app.extensions["job_runner"] = JobRunner(app)
 
+    if demo:
+        # Refused here rather than inside the view, because by the time
+        # start_analysis() decides the engine is missing it has already saved
+        # the upload to disk. A 4 GB ceiling and a public URL is a way for a
+        # stranger to fill the server's disk with videos nothing will ever
+        # read. before_request runs before the body is touched.
+        @app.before_request
+        def demo_guard():
+            path = request.path.rstrip("/")
+            if request.method != "GET" and path.startswith("/api/analysis"):
+                return jsonify({
+                    "error": "Automatic analysis is disabled on the public demo. "
+                             "Run it locally."
+                }), 403
+            if request.method == "DELETE" and path.startswith("/api/matches"):
+                return jsonify({
+                    "error": "Deleting matches is disabled on the public demo. "
+                             "Everyone shares this database."
+                }), 403
+            return None
+
     swept = sweep_uploads(Path(app.config["UPLOAD_DIR"]))
     if swept:
         app.logger.info("removed %d upload folder(s) older than a week", swept)
@@ -93,8 +126,15 @@ def create_app(config: dict | None = None) -> Flask:
 
     @app.errorhandler(413)
     def too_large(_):
-        gigabytes = MAX_UPLOAD_BYTES / 1024 ** 3
-        return jsonify({"error": f"That video is over the {gigabytes:.0f} GB upload limit."}), 413
+        # Read the limit back off the config rather than the constant: the
+        # demo lowers it, and a message naming 4 GB to somebody refused at
+        # 2 MB sends them looking for a problem that is not there.
+        limit = app.config["MAX_CONTENT_LENGTH"]
+        if limit >= 1024 ** 3:
+            size = f"{limit / 1024 ** 3:.0f} GB"
+        else:
+            size = f"{limit / 1024 ** 2:.0f} MB"
+        return jsonify({"error": f"That file is over the {size} upload limit."}), 413
 
     @app.errorhandler(404)
     def not_found(_):
