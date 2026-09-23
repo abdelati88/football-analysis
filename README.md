@@ -5,7 +5,11 @@ models at the video and have them tagged for you. Both produce the same
 objects, in the same coordinate system, in the same table — so the analyst's
 job is to correct the machine, not to choose between them.
 
-![The tagger](output_videos/screenshot.png)
+![The engine's annotated output: tracked players and ball with a top-down tactical radar](output_videos/screenshot.png)
+
+*The vision engine's own output — every player tracked and assigned to a team,
+the ball located, and a top-down radar placing all of them on the pitch in
+metres. Champions League final, PSG against Inter.*
 
 ---
 
